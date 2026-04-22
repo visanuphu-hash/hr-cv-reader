@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR Smart CV Reader v3 ✨</title>
+    <title>HR Smart CV Reader v4 ✨</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
@@ -37,29 +37,43 @@
     <div class="max-w-6xl mx-auto glass-panel p-6 md:p-10">
         <div class="text-center mb-8">
             <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
-                <i class="fa-solid fa-magic-wand-sparkles text-orange-500"></i> HR Smart CV Reader <span class="text-purple-500 text-2xl">v3</span>
+                <i class="fa-solid fa-magic-wand-sparkles text-orange-500"></i> HR Smart CV Reader <span class="text-pink-500 text-2xl">v4</span>
             </h1>
             <p class="text-gray-600">ผู้ช่วย AI ดึงข้อมูลจาก Resume อัตโนมัติ แล้วส่งออกเป็น Excel</p>
         </div>
 
         <div class="mb-8 bg-orange-50 p-4 rounded-xl border border-orange-200">
             <label class="block text-sm font-medium text-gray-700 mb-1">
-                <i class="fa-solid fa-key text-orange-400"></i> กรอก Gemini API Key ของคุณ (ฟรี) เพื่อให้ AI ทำงานได้
+                <i class="fa-solid fa-key text-orange-400"></i> ตั้งค่าระบบ AI & API Key
             </label>
-            <div class="flex flex-col sm:flex-row gap-2">
-                <input type="password" id="api-key-input" placeholder="วาง API Key ตรงนี้ (ขึ้นต้นด้วย AIza...)" 
-                       class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400 outline-none">
-                <div class="flex gap-2">
-                    <button onclick="saveApiKey()" class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition flex-1 sm:flex-none">
-                        บันทึกกุญแจ
-                    </button>
-                    <button onclick="testApiKey()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition flex-1 sm:flex-none">
-                        <i class="fa-solid fa-wifi"></i> ทดสอบกุญแจ
-                    </button>
+            <div class="flex flex-col gap-3">
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input type="password" id="api-key-input" placeholder="วาง API Key ตรงนี้ (ขึ้นต้นด้วย AIza...)" 
+                           class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400 outline-none">
+                    <div class="flex gap-2">
+                        <button onclick="saveSettings()" class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition flex-1 sm:flex-none">
+                            บันทึกตั้งค่า
+                        </button>
+                        <button onclick="testApiKey()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition flex-1 sm:flex-none">
+                            <i class="fa-solid fa-wifi"></i> ทดสอบกุญแจ
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- กล่องเลือกรุ่น AI เพิ่มใหม่ใน v4 -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 pt-2 border-t border-orange-200">
+                    <label class="text-sm font-medium text-gray-700">เลือกรุ่น AI ที่จะใช้งาน:</label>
+                    <select id="model-select" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400 outline-none bg-white text-gray-700 flex-1 sm:flex-none">
+                        <option value="gemini-2.5-flash-preview-09-2025">Gemini 2.5 Flash (ใหม่ล่าสุด/แนะนำ)</option>
+                        <option value="gemini-1.5-flash">Gemini 1.5 Flash (รุ่นมาตรฐาน)</option>
+                        <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                        <option value="gemini-pro">Gemini Pro (รุ่นเก่า)</option>
+                    </select>
+                    <span class="text-xs text-gray-500">* ถ้าทดสอบแล้ว Error ให้ลองเปลี่ยนรุ่นแล้วกดทดสอบใหม่ครับ</span>
                 </div>
             </div>
-            <p class="text-xs text-gray-500 mt-2">
-                * ข้อมูลนี้จะเก็บอยู่ในคอมพิวเตอร์ของคุณเท่านั้น ปลอดภัย 100% 
+            
+            <p class="text-xs text-gray-500 mt-3">
                 (ขอ API Key ฟรีได้ที่ <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-500 underline">Google AI Studio</a>)
             </p>
         </div>
@@ -111,19 +125,26 @@
         const resultContainer = document.getElementById('result-container');
         const resultBody = document.getElementById('result-body');
         const apiKeyInput = document.getElementById('api-key-input');
+        const modelSelect = document.getElementById('model-select');
 
         let extractedDataList = [];
 
+        // โหลดข้อมูลที่เคยบันทึกไว้
         window.onload = () => {
             const savedKey = localStorage.getItem('myGeminiKey');
+            const savedModel = localStorage.getItem('myGeminiModel');
             if(savedKey) apiKeyInput.value = savedKey;
+            if(savedModel) modelSelect.value = savedModel;
         };
 
-        function saveApiKey() {
+        // บันทึกทั้ง Key และ Model
+        function saveSettings() {
             const key = apiKeyInput.value.trim();
+            const model = modelSelect.value;
             if(key) {
                 localStorage.setItem('myGeminiKey', key);
-                alert("✅ บันทึกกุญแจสำเร็จ!");
+                localStorage.setItem('myGeminiModel', model);
+                alert("✅ บันทึกการตั้งค่าสำเร็จ!");
             } else {
                 alert("⚠️ กรุณากรอกกุญแจก่อนบันทึกครับ");
             }
@@ -137,17 +158,19 @@
 
         async function testApiKey() {
             const key = getApiKey();
+            const model = modelSelect.value;
+            
             if(!key) {
                 alert("⚠️ กรุณากรอก API Key ก่อนกดทดสอบครับ");
                 return apiKeyInput.focus();
             }
 
             statusMessage.classList.remove('hidden');
-            statusText.innerText = "กำลังทดสอบเชื่อมต่อกับระบบ AI...";
+            statusText.innerText = `กำลังทดสอบเชื่อมต่อกับรุ่น ${model}...`;
 
             try {
-                // อัปเดต: ใช้ gemini-1.5-flash-8b สำหรับสายฟรี 100% โควต้าเยอะ ไม่จำกัด
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent?key=${key}`;
+                // ดึงชื่อรุ่นจากที่ผู้ใช้เลือกใน Dropdown
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -160,9 +183,10 @@
                     throw new Error(result.error.message);
                 }
 
-                alert("✅ ยอดเยี่ยม! การเชื่อมต่อ AI สำเร็จ กุญแจของคุณใช้งานได้ปกติครับ ลากไฟล์ PDF มาวางได้เลย!");
+                alert(`✅ ยอดเยี่ยม! รุ่น ${model} ใช้งานได้ปกติ ลากไฟล์มาวางได้เลยครับ!`);
+                saveSettings(); // บันทึกรุ่นที่ใช้ได้ไว้อัตโนมัติ
             } catch (error) {
-                alert(`❌ เชื่อมต่อ AI ไม่สำเร็จครับ!\n\nข้อความจากระบบ: ${error.message}\n\nวิธีแก้: ลองตรวจสอบ API Key อีกครั้งว่าก๊อปปี้มาครบถ้วนไหม (ระวังมีช่องว่างแถมมาด้านหน้าหรือหลัง)`);
+                alert(`❌ รุ่นนี้ใช้งานไม่ได้ครับ!\n\nสาเหตุ: ${error.message}\n\n👉 วิธีแก้: ลองกดเปลี่ยนรุ่น AI เป็นรุ่นอื่นในตัวเลือก แล้วกดทดสอบใหม่ดูครับ`);
             }
 
             statusMessage.classList.add('hidden');
@@ -221,7 +245,7 @@
                     }
 
                     statusText.innerText = `[2/2] ให้ AI วิเคราะห์ข้อมูล: ${file.name} ...`;
-                    const structuredData = await processWithAI(rawText, currentApiKey);
+                    const structuredData = await processWithAI(rawText, currentApiKey, modelSelect.value);
                     
                     if(structuredData) {
                         extractedDataList.push(structuredData);
@@ -262,7 +286,7 @@
             });
         }
 
-        async function processWithAI(text, apiKeyToUse) {
+        async function processWithAI(text, apiKeyToUse, modelToUse) {
             const shortText = text.substring(0, 10000);
             const systemPrompt = `
                 คุณคือผู้เชี่ยวชาญด้าน HR หน้าที่ของคุณคือสกัดข้อมูลจากเรซูเม่ (Resume/CV) 
@@ -279,8 +303,8 @@
                 ห้ามอธิบายเพิ่ม ให้ตอบกลับมาเป็น JSON format ตามโครงสร้างด้านล่างนี้เท่านั้น
             `;
 
-            // อัปเดต: ใช้ gemini-1.5-flash-8b รุ่นขวัญใจสายฟรี
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent?key=${apiKeyToUse}`;
+            // ดึงข้อมูลผ่านรุ่นที่ผู้ใช้เลือก
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelToUse}:generateContent?key=${apiKeyToUse}`;
 
             try {
                 const response = await fetch(apiUrl, {
