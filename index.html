@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HR Smart CV Reader ✨</title>
     
-    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
-    <script src="[https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js](https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js)"></script>
-    <script src="[https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js](https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js)"></script>
-    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)">
-    <link href="[https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap](https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap)" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <style>
         body {
@@ -46,16 +46,22 @@
             <label class="block text-sm font-medium text-gray-700 mb-1">
                 <i class="fa-solid fa-key text-orange-400"></i> กรอก Gemini API Key ของคุณ (ฟรี) เพื่อให้ AI ทำงานได้
             </label>
-            <div class="flex gap-2">
+            <div class="flex flex-col sm:flex-row gap-2">
                 <input type="password" id="api-key-input" placeholder="วาง API Key ตรงนี้ (ขึ้นต้นด้วย AIza...)" 
                        class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400 outline-none">
-                <button onclick="saveApiKey()" class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
-                    บันทึกกุญแจ
-                </button>
+                <div class="flex gap-2">
+                    <button onclick="saveApiKey()" class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition flex-1 sm:flex-none">
+                        บันทึกกุญแจ
+                    </button>
+                    <!-- ปุ่มใหม่: เอาไว้เช็คว่ากุญแจใช้ได้จริงไหมก่อนลากไฟล์ -->
+                    <button onclick="testApiKey()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition flex-1 sm:flex-none">
+                        <i class="fa-solid fa-wifi"></i> ทดสอบกุญแจ
+                    </button>
+                </div>
             </div>
             <p class="text-xs text-gray-500 mt-2">
                 * ข้อมูลนี้จะเก็บอยู่ในคอมพิวเตอร์ของคุณเท่านั้น ปลอดภัย 100% 
-                (ขอ API Key ฟรีได้ที่ <a href="[https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)" target="_blank" class="text-blue-500 underline">Google AI Studio</a>)
+                (ขอ API Key ฟรีได้ที่ <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-500 underline">Google AI Studio</a>)
             </p>
         </div>
 
@@ -66,15 +72,15 @@
             <input type="file" id="file-input" class="hidden" accept=".pdf" multiple>
         </div>
 
-        <div id="status-message" class="text-center mt-6 text-orange-600 font-medium hidden p-4 bg-orange-50 rounded-lg">
-            <i class="fa-solid fa-spinner fa-spin mr-2"></i> <span id="status-text">กำลังให้ AI อ่านข้อมูล... กรุณารอสักครู่</span>
+        <div id="status-message" class="text-center mt-6 text-blue-600 font-medium hidden p-4 bg-blue-50 rounded-lg">
+            <i class="fa-solid fa-spinner fa-spin mr-2"></i> <span id="status-text">กำลังทำงาน... กรุณารอสักครู่</span>
         </div>
 
         <div class="mt-10 overflow-x-auto hidden" id="result-container">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold text-gray-800">ข้อมูลที่ดึงได้</h2>
                 <button onclick="exportToExcel()" class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg shadow transition-colors">
-                    <i class="fa-solid fa-file-excel mr-2"></i> ดาวน์โหลด Excel แบบจัดหน้า
+                    <i class="fa-solid fa-file-excel mr-2"></i> ดาวน์โหลด Excel
                 </button>
             </div>
             
@@ -97,7 +103,7 @@
     </div>
 
     <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = '[https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js](https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js)';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
@@ -118,9 +124,9 @@
             const key = apiKeyInput.value.trim();
             if(key) {
                 localStorage.setItem('myGeminiKey', key);
-                alert("บันทึกกุญแจสำเร็จ! ลองอัปโหลดไฟล์ได้เลยครับ");
+                alert("✅ บันทึกกุญแจสำเร็จ!");
             } else {
-                alert("กรุณากรอกกุญแจก่อนบันทึกครับ");
+                alert("⚠️ กรุณากรอกกุญแจก่อนบันทึกครับ");
             }
         }
 
@@ -128,6 +134,39 @@
             const userKey = apiKeyInput.value.trim();
             if (typeof apiKey !== 'undefined' && apiKey !== "") return apiKey; 
             return userKey;
+        }
+
+        // ฟังก์ชันใหม่: ทดสอบกุญแจว่าใช้ได้จริงไหม
+        async function testApiKey() {
+            const key = getApiKey();
+            if(!key) {
+                alert("⚠️ กรุณากรอก API Key ก่อนกดทดสอบครับ");
+                return apiKeyInput.focus();
+            }
+
+            statusMessage.classList.remove('hidden');
+            statusText.innerText = "กำลังทดสอบเชื่อมต่อกับระบบ AI...";
+
+            try {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: "Hello" }] }] })
+                });
+
+                const result = await response.json();
+
+                if (result.error) {
+                    throw new Error(result.error.message);
+                }
+
+                alert("✅ ยอดเยี่ยม! การเชื่อมต่อ AI สำเร็จ กุญแจของคุณใช้งานได้ปกติครับ ลากไฟล์ PDF มาวางได้เลย!");
+            } catch (error) {
+                alert(`❌ เชื่อมต่อ AI ไม่สำเร็จครับ!\n\nข้อความจากระบบ: ${error.message}\n\nวิธีแก้: ลองตรวจสอบ API Key อีกครั้งว่าก๊อปปี้มาครบถ้วนไหม (ระวังมีช่องว่างแถมมาด้านหน้าหรือหลัง)`);
+            }
+
+            statusMessage.classList.add('hidden');
         }
 
         window.addEventListener('dragover', (e) => e.preventDefault());
@@ -159,7 +198,7 @@
             
             const currentApiKey = getApiKey();
             if(!currentApiKey) {
-                alert("⚠️ กรุณากรอก Gemini API Key ด้านบนก่อนนะครับ ไม่งั้น AI จะไม่ยอมทำงานครับ");
+                alert("⚠️ กรุณากรอก Gemini API Key ก่อนนะครับ ไม่งั้น AI จะไม่ยอมทำงานครับ");
                 apiKeyInput.focus();
                 return;
             }
@@ -175,14 +214,14 @@
                 }
 
                 try {
-                    statusText.innerText = `กำลังแกะตัวหนังสือจากไฟล์: ${file.name} ...`;
+                    statusText.innerText = `[1/2] กำลังแกะตัวหนังสือจากไฟล์: ${file.name} ...`;
                     const rawText = await extractTextFromPDF(file);
                     
                     if (!rawText || rawText.trim() === "") {
-                        throw new Error("ไฟล์ PDF นี้เป็นรูปภาพหรือไม่มีตัวหนังสือให้แกะครับ");
+                        throw new Error("⚠️ ไฟล์ PDF นี้ถูกล็อค หรือเป็นรูปภาพจากการแสกน ทำให้ดึงตัวหนังสือออกมาไม่ได้ครับ");
                     }
 
-                    statusText.innerText = `ให้ AI อ่านไฟล์: ${file.name} (อาจใช้เวลา 5-10 วินาที) ...`;
+                    statusText.innerText = `[2/2] ให้ AI วิเคราะห์ข้อมูล: ${file.name} ...`;
                     const structuredData = await processWithAI(rawText, currentApiKey);
                     
                     if(structuredData) {
@@ -191,7 +230,8 @@
                     }
                 } catch (error) {
                     console.error("Error Detail:", error);
-                    alert(`❌ ดึงข้อมูลจากไฟล์ ${file.name} ไม่สำเร็จครับ\n\nสาเหตุ: ${error.message}`);
+                    // สังเกตว่า Error ของใหม่จะมีเครื่องหมาย ❌ แบบนี้นะครับ
+                    alert(`❌ ดึงข้อมูลจากไฟล์ ${file.name} ไม่สำเร็จ\n\nสาเหตุ: ${error.message}`);
                 }
             }
 
@@ -216,10 +256,10 @@
                         }
                         resolve(fullText);
                     } catch (error) {
-                        reject(new Error("ไม่สามารถอ่านไฟล์ PDF ได้ ไฟล์อาจจะเสียหรือถูกล็อครหัสไว้ครับ"));
+                        reject(new Error("เบราว์เซอร์อ่านไฟล์ PDF นี้ไม่ได้ครับ (ไฟล์อาจจะเสียหรือล็อครหัส)"));
                     }
                 };
-                reader.onerror = () => reject(new Error("เบราว์เซอร์อ่านไฟล์ไม่สำเร็จ"));
+                reader.onerror = () => reject(new Error("การโหลดไฟล์ล้มเหลว"));
                 reader.readAsArrayBuffer(file);
             });
         }
@@ -241,7 +281,6 @@
                 ห้ามอธิบายเพิ่ม ให้ตอบกลับมาเป็น JSON format ตามโครงสร้างด้านล่างนี้เท่านั้น
             `;
 
-            // ใช้ gemini-1.5-flash ซึ่งเสถียรสำหรับ API Key ของผู้ใช้ทั่วไปมากที่สุด
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKeyToUse}`;
 
             try {
@@ -272,20 +311,15 @@
 
                 const result = await response.json();
 
-                // ดักจับ Error จากฝั่ง Google (เช่น API Key ผิด)
                 if (result.error) {
-                    throw new Error(`API Error: ${result.error.message} (เช็ค API Key อีกครั้งครับ)`);
+                    throw new Error(`ระบบ AI ปฏิเสธการทำงาน (${result.error.message})`);
                 }
 
                 let jsonString = result.candidates[0].content.parts[0].text;
-                
-                // คาถาป้องกัน AI ซน: ตัดข้อความ ```json และ ``` ที่อาจจะติดมาทิ้งไป
                 jsonString = jsonString.replace(/```json/g, "").replace(/```/g, "").trim();
-                
                 return JSON.parse(jsonString);
 
             } catch (error) {
-                console.error("AI Processing Error:", error);
                 throw error;
             }
         }
@@ -307,10 +341,7 @@
         }
 
         async function exportToExcel() {
-            if (extractedDataList.length === 0) {
-                alert("ยังไม่มีข้อมูลให้ส่งออกครับ");
-                return;
-            }
+            if (extractedDataList.length === 0) return alert("ยังไม่มีข้อมูลให้ส่งออกครับ");
 
             const workbook = new ExcelJS.Workbook();
             const worksheet = workbook.addWorksheet('รายชื่อผู้สมัคร');
@@ -325,9 +356,7 @@
                 { header: 'ทักษะเด่น', key: 'skills', width: 45 }
             ];
 
-            extractedDataList.forEach(data => {
-                worksheet.addRow(data);
-            });
+            extractedDataList.forEach(data => worksheet.addRow(data));
 
             const headerRow = worksheet.getRow(1);
             headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
