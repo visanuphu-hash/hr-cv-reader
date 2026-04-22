@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR Smart CV Reader ✨</title>
+    <!-- เปลี่ยนชื่อ Title เพื่อให้สังเกตง่ายว่าอัปเดตแล้ว -->
+    <title>HR Smart CV Reader v2 ✨</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
@@ -37,7 +38,7 @@
     <div class="max-w-6xl mx-auto glass-panel p-6 md:p-10">
         <div class="text-center mb-8">
             <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
-                <i class="fa-solid fa-magic-wand-sparkles text-orange-500"></i> HR Smart CV Reader
+                <i class="fa-solid fa-magic-wand-sparkles text-orange-500"></i> HR Smart CV Reader <span class="text-blue-500 text-2xl">v2</span>
             </h1>
             <p class="text-gray-600">ผู้ช่วย AI ดึงข้อมูลจาก Resume อัตโนมัติ แล้วส่งออกเป็น Excel</p>
         </div>
@@ -53,7 +54,6 @@
                     <button onclick="saveApiKey()" class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition flex-1 sm:flex-none">
                         บันทึกกุญแจ
                     </button>
-                    <!-- ปุ่มใหม่: เอาไว้เช็คว่ากุญแจใช้ได้จริงไหมก่อนลากไฟล์ -->
                     <button onclick="testApiKey()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition flex-1 sm:flex-none">
                         <i class="fa-solid fa-wifi"></i> ทดสอบกุญแจ
                     </button>
@@ -136,7 +136,6 @@
             return userKey;
         }
 
-        // ฟังก์ชันทดสอบกุญแจ
         async function testApiKey() {
             const key = getApiKey();
             if(!key) {
@@ -148,8 +147,8 @@
             statusText.innerText = "กำลังทดสอบเชื่อมต่อกับระบบ AI...";
 
             try {
-                // อัปเดต: เปลี่ยนชื่อรุ่น AI กลับเป็นรุ่นล่าสุดที่รองรับ
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`;
+                // อัปเกรดเป็น gemini-2.0-flash รุ่นใหม่ล่าสุด
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`;
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -281,8 +280,8 @@
                 ห้ามอธิบายเพิ่ม ให้ตอบกลับมาเป็น JSON format ตามโครงสร้างด้านล่างนี้เท่านั้น
             `;
 
-            // อัปเดต: เปลี่ยนชื่อรุ่น AI กลับเป็นรุ่นล่าสุด
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKeyToUse}`;
+            // อัปเกรดเป็น gemini-2.0-flash
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKeyToUse}`;
 
             try {
                 const response = await fetch(apiUrl, {
