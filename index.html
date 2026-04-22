@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR Smart CV Reader v10 ✨</title>
+    <title>HR Smart CV Reader v11 (DeepSeek) 🐋</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
@@ -14,7 +14,7 @@
     <style>
         body {
             font-family: 'Kanit', sans-serif;
-            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            background: linear-gradient(135deg, #f0f4ff 0%, #d9e2ff 100%);
             min-height: 100vh;
         }
         .glass-panel {
@@ -22,13 +22,13 @@
             backdrop-filter: blur(10px);
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 50, 150, 0.1);
         }
         .dragover {
             background: rgba(255, 255, 255, 1) !important;
-            border-color: #6366f1 !important;
+            border-color: #3b82f6 !important;
             transform: scale(1.02);
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
         }
     </style>
 </head>
@@ -36,10 +36,10 @@
 
     <div class="max-w-6xl mx-auto glass-panel p-6 md:p-10">
         <div class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
-                <i class="fa-solid fa-bolt text-indigo-600"></i> HR Smart CV Reader <span class="text-indigo-500 text-2xl">v10</span>
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-800 mb-2">
+                <i class="fa-solid fa-water text-blue-600"></i> HR Smart CV Reader <span class="text-blue-500 text-2xl">v11</span>
             </h1>
-            <p class="text-gray-600 font-medium">Auto Mode: ดึงข้อมูลอัตโนมัติด้วยพลัง Gemini 2.5 Flash Lite</p>
+            <p class="text-gray-600 font-medium">Auto Mode: ขับเคลื่อนด้วยพลังสมองกล DeepSeek AI 🐋</p>
         </div>
 
         <div id="debug-box" class="hidden mb-8 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm">
@@ -50,27 +50,27 @@
             <p id="debug-text" class="text-sm text-red-600 font-mono break-words whitespace-pre-wrap"></p>
         </div>
 
-        <div id="drop-zone" class="border-4 border-dashed border-gray-300 rounded-xl p-16 text-center bg-white bg-opacity-50 transition-all duration-300 cursor-pointer hover:bg-indigo-50 relative overflow-hidden">
-            <i class="fa-regular fa-file-pdf text-6xl text-indigo-400 mb-6 drop-shadow-md"></i>
+        <div id="drop-zone" class="border-4 border-dashed border-blue-300 rounded-xl p-16 text-center bg-white bg-opacity-50 transition-all duration-300 cursor-pointer hover:bg-blue-50 relative overflow-hidden">
+            <i class="fa-regular fa-file-pdf text-6xl text-blue-400 mb-6 drop-shadow-md"></i>
             <h3 class="text-3xl font-bold text-gray-700">คลิกที่นี่ หรือ ลากไฟล์ PDF มาวางตรงนี้</h3>
             <p class="text-gray-500 mt-3 text-lg">ระบบจะวิเคราะห์และสกัดข้อมูลให้โดยอัตโนมัติ (รองรับหลายไฟล์)</p>
             <input type="file" id="file-input" class="hidden" accept=".pdf" multiple>
         </div>
 
-        <div id="status-message" class="text-center mt-6 text-indigo-600 font-bold hidden p-4 bg-indigo-50 rounded-lg shadow-sm text-lg border border-indigo-100">
+        <div id="status-message" class="text-center mt-6 text-blue-600 font-bold hidden p-4 bg-blue-50 rounded-lg shadow-sm text-lg border border-blue-100">
             <i class="fa-solid fa-spinner fa-spin mr-2"></i> <span id="status-text">กำลังทำงาน... กรุณารอสักครู่</span>
         </div>
 
         <div class="mt-10 overflow-x-auto hidden" id="result-container">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold text-gray-800"><i class="fa-solid fa-users text-indigo-500"></i> ข้อมูลที่ดึงได้</h2>
+                <h2 class="text-2xl font-bold text-gray-800"><i class="fa-solid fa-users text-blue-500"></i> ข้อมูลที่ดึงได้</h2>
                 <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-colors transform hover:-translate-y-0.5">
                     <i class="fa-solid fa-file-excel mr-2"></i> ดาวน์โหลด Excel
                 </button>
             </div>
             
             <table class="w-full text-left border-collapse bg-white rounded-lg overflow-hidden shadow-md text-sm md:text-base">
-                <thead class="bg-indigo-800 text-white">
+                <thead class="bg-blue-800 text-white">
                     <tr>
                         <th class="p-4 font-medium">ชื่อ</th>
                         <th class="p-4 font-medium">นามสกุล</th>
@@ -89,14 +89,14 @@
 
     <script>
         // ====================================================================
-        // ⚙️ ตั้งค่าระบบ (Hardcoded Settings)
+        // ⚙️ ตั้งค่าระบบ (Hardcoded Settings for DeepSeek)
         // ====================================================================
         
-        // 1. นำ API Key ที่ใช้งานได้มาใส่ในเครื่องหมายคำพูดด้านล่างแทนที่ข้อความเดิม
-        const MY_API_KEY = "AIzaSyByzby3OvxOfQlQldF4UOEpDLNbTqiv9mw";
+        // 1. นำ API Key ของ DeepSeek (ขึ้นต้นด้วย sk-) มาวางในเครื่องหมายคำพูดด้านล่าง
+        const MY_API_KEY = "sk-8be52e89365c431ab72f052beafd0540";
         
-        // 2. กำหนดรุ่น AI เป็น Gemini 2.5 Flash Lite ตามที่คุณต้องการ
-        const TARGET_MODEL = "v1beta/models/gemini-2.5-flash";
+        // 2. กำหนดรุ่น AI ของ DeepSeek (แนะนำ deepseek-chat เพราะฉลาดและตอบเป็น JSON เก่งมาก)
+        const TARGET_MODEL = "deepseek-chat";
         
         // ====================================================================
 
@@ -116,7 +116,7 @@
         function showDebugError(errObj) {
             debugBox.classList.remove('hidden');
             let errString = typeof errObj === 'object' ? JSON.stringify(errObj, null, 2) : errObj;
-            debugText.innerText = errString;
+            debugText.innerText = `[แจ้งเตือน]\n${errString}\n\n👉 วิธีแก้: ตรวจสอบ API Key ของ DeepSeek อีกครั้ง (ต้องขึ้นต้นด้วย sk-...) หรือตรวจสอบเครดิตในเว็บ DeepSeek ครับ`;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -138,8 +138,12 @@
             if (files.length === 0) return;
             
             // ตรวจสอบว่าผู้ใช้เปลี่ยน API KEY หรือยัง
-            if (MY_API_KEY === "ใส่_API_KEY_ของ_GOOGLE_ตรงนี้" || MY_API_KEY.trim() === "") {
-                alert("⚠️ คุณยังไม่ได้ฝัง API Key ลงในโค้ดครับ!\n\nกรุณาเปิดไฟล์นี้ด้วยโปรแกรม Notepad แล้วหาบรรทัดที่ 103 เพื่อนำ API Key มาใส่ก่อนใช้งานครับ");
+            if (MY_API_KEY === "ใส่_API_KEY_ของ_DEEPSEEK_ตรงนี้" || MY_API_KEY.trim() === "") {
+                alert("⚠️ คุณยังไม่ได้ฝัง API Key ของ DeepSeek ลงในโค้ดครับ!\n\nกรุณาเปิดไฟล์นี้ด้วยโปรแกรม Notepad แล้วนำ API Key มาใส่ก่อนใช้งานครับ");
+                return;
+            }
+            if (!MY_API_KEY.startsWith("sk-")) {
+                alert("⚠️ API Key ของ DeepSeek ต้องขึ้นต้นด้วย 'sk-' นะครับ ลองตรวจสอบดูใหม่ครับ");
                 return;
             }
             
@@ -161,7 +165,7 @@
                         throw new Error("ไฟล์ PDF เป็นรูปภาพสแกน ไม่มีตัวหนังสือให้แกะครับ");
                     }
 
-                    statusText.innerText = `[ไฟล์ ${i+1}/${files.length}] AI กำลังวิเคราะห์ข้อมูล...`;
+                    statusText.innerText = `[ไฟล์ ${i+1}/${files.length}] DeepSeek กำลังวิเคราะห์ข้อมูล...`;
                     const structuredData = await processWithAI(rawText);
                     
                     if(structuredData) {
@@ -202,7 +206,7 @@
         }
 
         async function processWithAI(text) {
-            const shortText = text.substring(0, 10000);
+            const shortText = text.substring(0, 15000); // DeepSeek รองรับข้อความได้ยาว
             const systemPrompt = `
                 คุณคือผู้เชี่ยวชาญด้าน HR หน้าที่ของคุณคือสกัดข้อมูลจากเรซูเม่ (Resume/CV) 
                 ให้อ่านข้อความที่ให้มา และดึงข้อมูลต่อไปนี้ออกมา:
@@ -215,59 +219,64 @@
                 7. ทักษะเด่น (Skills) ให้ดึงมาสัก 3-5 อย่าง คั่นด้วยลูกน้ำ (,)
 
                 หากหาข้อมูลไหนไม่เจอ ให้ใส่ค่าว่าง "" 
-                ห้ามอธิบายเพิ่ม ให้ตอบกลับมาเป็น JSON format ตามโครงสร้างด้านล่างนี้เท่านั้น
+                ห้ามอธิบายเพิ่ม ให้ตอบกลับมาเป็น JSON format ตามโครงสร้างด้านล่างนี้เท่านั้น:
+                {
+                    "firstName": "",
+                    "lastName": "",
+                    "email": "",
+                    "phone": "",
+                    "recentJobTitle": "",
+                    "recentCompany": "",
+                    "skills": ""
+                }
             `;
 
-            // ดึงค่า API Key และ Model จากที่เราตั้งค่าไว้ด้านบน
-            const apiUrl = `https://generativelanguage.googleapis.com/${TARGET_MODEL}:generateContent?key=${MY_API_KEY}`;
+            // API Endpoint ของ DeepSeek
+            const apiUrl = `https://api.deepseek.com/chat/completions`;
 
             const response = await fetch(apiUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${MY_API_KEY}`
+                },
                 body: JSON.stringify({
-                    contents: [{ parts: [{ text: shortText }] }],
-                    systemInstruction: { parts: [{ text: systemPrompt }] },
-                    generationConfig: {
-                        responseMimeType: "application/json",
-                        responseSchema: {
-                            type: "OBJECT",
-                            properties: {
-                                firstName: { type: "STRING" }, lastName: { type: "STRING" },
-                                email: { type: "STRING" }, phone: { type: "STRING" },
-                                recentJobTitle: { type: "STRING" }, recentCompany: { type: "STRING" },
-                                skills: { type: "STRING" }
-                            },
-                            required: ["firstName", "lastName", "email", "phone", "recentJobTitle", "recentCompany", "skills"]
-                        }
-                    }
+                    model: TARGET_MODEL,
+                    response_format: { type: "json_object" }, // บังคับให้ DeepSeek ตอบเป็น JSON
+                    messages: [
+                        { role: "system", content: systemPrompt },
+                        { role: "user", content: shortText }
+                    ],
+                    temperature: 0.1
                 })
             });
 
-            const responseText = await response.text();
-            let result;
-            try { result = JSON.parse(responseText); } catch(e) { throw new Error("JSON Parse Error: " + responseText); }
+            const result = await response.json();
 
             if (!response.ok || result.error) {
-                let errMsg = result.error ? result.error.message : responseText;
-                throw new Error("AI ปฏิเสธการทำงาน: " + errMsg);
+                let errMsg = result.error ? result.error.message : "เชื่อมต่อ DeepSeek ไม่สำเร็จ";
+                throw new Error("DeepSeek ปฏิเสธการทำงาน: " + errMsg);
             }
 
-            let jsonString = result.candidates[0].content.parts[0].text;
+            let jsonString = result.choices[0].message.content;
+            
+            // คลีน JSON string เผื่อ AI ตอบกลับมามี ```json ติดมาด้วย
             jsonString = jsonString.replace(/```json/g, "").replace(/```/g, "").trim();
+            
             return JSON.parse(jsonString);
         }
 
         function addRowToTable(data) {
             const tr = document.createElement('tr');
-            tr.className = "hover:bg-indigo-50 transition-colors";
+            tr.className = "hover:bg-blue-50 transition-colors";
             tr.innerHTML = `
                 <td class="p-4 border-b text-gray-800">${data.firstName || '-'}</td>
                 <td class="p-4 border-b text-gray-800">${data.lastName || '-'}</td>
-                <td class="p-4 border-b text-indigo-600 font-medium">${data.email || '-'}</td>
+                <td class="p-4 border-b text-blue-600 font-medium">${data.email || '-'}</td>
                 <td class="p-4 border-b text-gray-800">${data.phone || '-'}</td>
                 <td class="p-4 border-b font-semibold text-gray-700">${data.recentJobTitle || '-'}</td>
                 <td class="p-4 border-b text-gray-800">${data.recentCompany || '-'}</td>
-                <td class="p-4 border-b text-purple-600">${data.skills || '-'}</td>
+                <td class="p-4 border-b text-blue-500">${data.skills || '-'}</td>
             `;
             resultBody.appendChild(tr);
         }
@@ -289,7 +298,7 @@
 
             const headerRow = worksheet.getRow(1);
             headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-            headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4F46E5' } }; 
+            headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E40AF' } }; // สีน้ำเงินเข้ม
             headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
 
             worksheet.eachRow((row, rowNumber) => {
@@ -304,7 +313,7 @@
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.setAttribute("href", url);
-            link.setAttribute("download", "HR_Smart_CV_Data.xlsx");
+            link.setAttribute("download", "HR_Smart_CV_DeepSeek.xlsx");
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
