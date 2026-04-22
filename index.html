@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR Smart CV Reader v9 ✨</title>
+    <title>HR Smart CV Reader v10 ✨</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
@@ -37,41 +37,9 @@
     <div class="max-w-6xl mx-auto glass-panel p-6 md:p-10">
         <div class="text-center mb-8">
             <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
-                <i class="fa-solid fa-microchip text-indigo-600"></i> HR Smart CV Reader <span class="text-indigo-500 text-2xl">v9</span>
+                <i class="fa-solid fa-bolt text-indigo-600"></i> HR Smart CV Reader <span class="text-indigo-500 text-2xl">v10</span>
             </h1>
-            <p class="text-gray-600 font-medium">ระบบสแกนสมอง AI อัตโนมัติ (แก้ปัญหา Model Not Found)</p>
-        </div>
-
-        <div class="mb-8 bg-indigo-50 p-5 rounded-xl border border-indigo-200 shadow-sm">
-            <label class="block text-sm font-bold text-gray-800 mb-2">
-                <i class="fa-solid fa-key text-indigo-500"></i> 1. กรอก Google Gemini API Key (ขึ้นต้นด้วย AIza...) 
-            </label>
-            <div class="flex flex-col gap-3">
-                <div class="flex flex-col sm:flex-row gap-2">
-                    <input type="password" id="api-key-input" placeholder="AIzaSy..." 
-                           class="flex-1 px-4 py-3 border border-indigo-300 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none font-mono">
-                    <button onclick="clearSettings()" class="bg-red-500 text-white px-4 py-3 rounded-lg hover:bg-red-600 transition font-medium" title="ล้างกุญแจเก่าที่พังแล้ว">
-                        <i class="fa-solid fa-trash"></i> ล้างกุญแจเก่า
-                    </button>
-                </div>
-                
-                <label class="block text-sm font-bold text-gray-800 mt-2">
-                    <i class="fa-solid fa-radar text-indigo-500"></i> 2. สแกนหารุ่น AI และทดสอบ (ทำตามลำดับ)
-                </label>
-                <div class="flex flex-col sm:flex-row gap-2">
-                    <button onclick="scanModels()" class="bg-indigo-600 text-white px-5 py-3 rounded-lg hover:bg-indigo-700 transition flex-1 font-bold shadow-md">
-                        <i class="fa-solid fa-magnifying-glass"></i> กดยืนยันเพื่อสแกนหารุ่น AI
-                    </button>
-                    
-                    <select id="model-select" class="px-4 py-3 border border-indigo-300 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none bg-white text-gray-700 flex-1 font-medium">
-                        <option value="">-- กรุณากดสแกนหารุ่น AI ก่อน --</option>
-                    </select>
-
-                    <button onclick="testApiKey()" id="test-btn" class="bg-green-500 text-white px-5 py-3 rounded-lg hover:bg-green-600 transition flex-1 font-bold shadow-md opacity-50 cursor-not-allowed" disabled>
-                        <i class="fa-solid fa-check-circle"></i> ทดสอบการดึงข้อมูล
-                    </button>
-                </div>
-            </div>
+            <p class="text-gray-600 font-medium">Auto Mode: ดึงข้อมูลอัตโนมัติด้วยพลัง Gemini Flash Lite</p>
         </div>
 
         <div id="debug-box" class="hidden mb-8 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm">
@@ -82,21 +50,21 @@
             <p id="debug-text" class="text-sm text-red-600 font-mono break-words whitespace-pre-wrap"></p>
         </div>
 
-        <div id="drop-zone" class="border-4 border-dashed border-gray-300 rounded-xl p-12 text-center bg-white bg-opacity-50 transition-all duration-300 cursor-pointer hover:bg-indigo-50 relative overflow-hidden">
-            <i class="fa-regular fa-file-pdf text-6xl text-indigo-300 mb-4"></i>
-            <h3 class="text-2xl font-bold text-gray-700">คลิกที่นี่ หรือ ลากไฟล์ PDF มาวางตรงนี้</h3>
-            <p class="text-gray-500 mt-2 text-lg">รองรับการอัปโหลดครั้งละหลายไฟล์</p>
+        <div id="drop-zone" class="border-4 border-dashed border-gray-300 rounded-xl p-16 text-center bg-white bg-opacity-50 transition-all duration-300 cursor-pointer hover:bg-indigo-50 relative overflow-hidden">
+            <i class="fa-regular fa-file-pdf text-6xl text-indigo-400 mb-6 drop-shadow-md"></i>
+            <h3 class="text-3xl font-bold text-gray-700">คลิกที่นี่ หรือ ลากไฟล์ PDF มาวางตรงนี้</h3>
+            <p class="text-gray-500 mt-3 text-lg">ระบบจะวิเคราะห์และสกัดข้อมูลให้โดยอัตโนมัติ (รองรับหลายไฟล์)</p>
             <input type="file" id="file-input" class="hidden" accept=".pdf" multiple>
         </div>
 
-        <div id="status-message" class="text-center mt-6 text-indigo-600 font-bold hidden p-4 bg-indigo-50 rounded-lg shadow-sm text-lg">
+        <div id="status-message" class="text-center mt-6 text-indigo-600 font-bold hidden p-4 bg-indigo-50 rounded-lg shadow-sm text-lg border border-indigo-100">
             <i class="fa-solid fa-spinner fa-spin mr-2"></i> <span id="status-text">กำลังทำงาน... กรุณารอสักครู่</span>
         </div>
 
         <div class="mt-10 overflow-x-auto hidden" id="result-container">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold text-gray-800"><i class="fa-solid fa-users text-indigo-500"></i> ข้อมูลที่ดึงได้</h2>
-                <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg shadow transition-colors">
+                <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-colors transform hover:-translate-y-0.5">
                     <i class="fa-solid fa-file-excel mr-2"></i> ดาวน์โหลด Excel
                 </button>
             </div>
@@ -120,6 +88,18 @@
     </div>
 
     <script>
+        // ====================================================================
+        // ⚙️ ตั้งค่าระบบ (Hardcoded Settings)
+        // ====================================================================
+        
+        // 1. นำ API Key ที่ใช้งานได้มาใส่ในเครื่องหมายคำพูดด้านล่างแทนที่ข้อความเดิม
+        const MY_API_KEY = "AIzaSyByzby3OvxOfQlQldF4UOEpDLNbTqiv9mw";
+        
+        // 2. กำหนดรุ่น AI เป็น Gemini 2.0 Flash Lite (เบา ไว และประหยัดโควต้า)
+        const TARGET_MODEL = "v1beta/models/gemini-2.0-flash-lite-preview-02-05";
+        
+        // ====================================================================
+
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
         const dropZone = document.getElementById('drop-zone');
@@ -128,149 +108,16 @@
         const statusText = document.getElementById('status-text');
         const resultContainer = document.getElementById('result-container');
         const resultBody = document.getElementById('result-body');
-        const apiKeyInput = document.getElementById('api-key-input');
-        const modelSelect = document.getElementById('model-select');
-        const testBtn = document.getElementById('test-btn');
         const debugBox = document.getElementById('debug-box');
         const debugText = document.getElementById('debug-text');
 
         let extractedDataList = [];
-
-        window.onload = () => {
-            const savedKey = localStorage.getItem('myGeminiKeyV9');
-            if(savedKey) {
-                apiKeyInput.value = savedKey;
-                // ถ้ามีกุญแจ ให้ลองสแกนโมเดลอัตโนมัติ
-                scanModels(false);
-            }
-        };
-
-        function getApiKey() {
-            return apiKeyInput.value.trim();
-        }
-
-        function clearSettings() {
-            localStorage.removeItem('myGeminiKeyV9');
-            apiKeyInput.value = '';
-            modelSelect.innerHTML = '<option value="">-- กรุณากดสแกนหารุ่น AI ก่อน --</option>';
-            testBtn.disabled = true;
-            testBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            alert("🗑️ ล้างความจำกุญแจเก่าเรียบร้อยครับ วางอันใหม่ได้เลย");
-        }
 
         function showDebugError(errObj) {
             debugBox.classList.remove('hidden');
             let errString = typeof errObj === 'object' ? JSON.stringify(errObj, null, 2) : errObj;
             debugText.innerText = errString;
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // ฟังก์ชันใหม่เอี่ยม: ให้ระบบไปถาม Google ว่ามี Model ไหนใช้ได้บ้าง
-        async function scanModels(showAlert = true) {
-            const key = getApiKey();
-            debugBox.classList.add('hidden');
-            
-            if(!key || !key.startsWith("AIza")) {
-                if(showAlert) alert("⚠️ กรุณาวาง API Key ของ Google (ขึ้นต้นด้วย AIza...) ในช่องด้านบนก่อนครับ");
-                return apiKeyInput.focus();
-            }
-
-            statusMessage.classList.remove('hidden');
-            statusText.innerText = `กำลังสแกนหารุ่น AI ที่กุญแจนี้มีสิทธิ์ใช้...`;
-
-            try {
-                // เรียกใช้ ListModels API เพื่อดึงรายชื่อรุ่นที่มีอยู่จริง
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
-                const data = await response.json();
-
-                if (data.error) {
-                    throw new Error(`Google ปฏิเสธกุญแจนี้: ${data.error.message}`);
-                }
-
-                if (data.models && data.models.length > 0) {
-                    // กรองเอารุ่นที่ใช้อ่านข้อความได้ (generateContent) และเป็นตระกูล Gemini
-                    const validModels = data.models.filter(m => 
-                        m.supportedGenerationMethods && 
-                        m.supportedGenerationMethods.includes('generateContent') &&
-                        m.name.includes('gemini')
-                    );
-
-                    if (validModels.length === 0) {
-                        throw new Error("กุญแจนี้ถูกต้อง แต่ไม่มีสิทธิ์ใช้ AI รุ่นใดๆ เลยครับ (อาจต้องเปิดใช้งาน API ใน Google Cloud)");
-                    }
-
-                    // ล้างตัวเลือกเก่าทิ้ง
-                    modelSelect.innerHTML = '';
-
-                    // นำรายชื่อรุ่นที่มีอยู่จริงมาใส่ให้เลือก
-                    validModels.forEach(m => {
-                        const opt = document.createElement('option');
-                        // ตัวอย่าง m.name คือ "models/gemini-1.5-flash"
-                        opt.value = `v1beta/${m.name}`; 
-                        opt.text = m.displayName || m.name.replace('models/', '');
-                        modelSelect.appendChild(opt);
-                    });
-
-                    // เปิดให้กดปุ่มทดสอบได้
-                    testBtn.disabled = false;
-                    testBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                    
-                    // บันทึกกุญแจ
-                    localStorage.setItem('myGeminiKeyV9', key);
-                    
-                    if(showAlert) alert(`✅ สแกนสำเร็จ! พบ AI ที่ใช้งานได้ ${validModels.length} รุ่น (แสดงในเมนูแล้ว) กรุณากดปุ่ม "ทดสอบการดึงข้อมูล" ต่อได้เลยครับ`);
-                } else {
-                    throw new Error("ไม่พบรุ่น AI ในระบบของ Google สำหรับกุญแจนี้เลยครับ");
-                }
-            } catch (error) {
-                showDebugError(error.message);
-                modelSelect.innerHTML = '<option value="">-- สแกนล้มเหลว กรุณาตรวจสอบกุญแจ --</option>';
-            }
-
-            statusMessage.classList.add('hidden');
-        }
-
-        // ฟังก์ชันทดสอบแบบเดิม แต่ใช้ Model ที่สแกนเจอแน่นอน
-        async function testApiKey() {
-            const key = getApiKey();
-            const modelPath = modelSelect.value; 
-            debugBox.classList.add('hidden'); 
-            
-            if(!modelPath) {
-                return alert("⚠️ กรุณากดสแกนหารุ่น AI ก่อนครับ");
-            }
-
-            statusMessage.classList.remove('hidden');
-            statusText.innerText = `กำลังทดสอบการทำงานกับ ${modelSelect.options[modelSelect.selectedIndex].text}...`;
-
-            try {
-                const apiUrl = `https://generativelanguage.googleapis.com/${modelPath}:generateContent?key=${key}`;
-                
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: "Say OK" }] }] })
-                });
-
-                const responseText = await response.text(); 
-                
-                let result;
-                try {
-                    result = JSON.parse(responseText);
-                } catch(e) {
-                    throw new Error("ระบบ AI ส่งข้อมูลกลับมาผิดปกติ: " + responseText);
-                }
-
-                if (!response.ok || result.error) {
-                    throw new Error(JSON.stringify(result.error || responseText));
-                }
-
-                alert(`✅ ผ่านฉลุย! การเชื่อมต่อสมบูรณ์ 100% ลากไฟล์ PDF มาวางเริ่มงานได้เลยครับ 🎉`);
-            } catch (error) {
-                showDebugError(error.message);
-            }
-
-            statusMessage.classList.add('hidden');
         }
 
         window.addEventListener('dragover', (e) => e.preventDefault());
@@ -290,11 +137,9 @@
             debugBox.classList.add('hidden');
             if (files.length === 0) return;
             
-            const currentApiKey = getApiKey();
-            const selectedModel = modelSelect.value;
-
-            if(!currentApiKey || !selectedModel) {
-                alert("⚠️ กรุณากดปุ่มสแกนและทดสอบให้ผ่านก่อนลากไฟล์ครับ");
+            // ตรวจสอบว่าผู้ใช้เปลี่ยน API KEY หรือยัง
+            if (MY_API_KEY === "ใส่_API_KEY_ของ_GOOGLE_ตรงนี้" || MY_API_KEY.trim() === "") {
+                alert("⚠️ คุณยังไม่ได้ฝัง API Key ลงในโค้ดครับ!\n\nกรุณาเปิดไฟล์นี้ด้วยโปรแกรม Notepad แล้วหาบรรทัดที่ 103 เพื่อนำ API Key มาใส่ก่อนใช้งานครับ");
                 return;
             }
             
@@ -304,27 +149,27 @@
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 if (file.type !== 'application/pdf') {
-                    alert(`ไฟล์ ${file.name} ไม่ใช่ PDF ครับ`);
+                    alert(`ไฟล์ ${file.name} ไม่ใช่ PDF ครับ (ขอข้ามไปก่อน)`);
                     continue;
                 }
 
                 try {
-                    statusText.innerText = `[1/2] แกะข้อความ: ${file.name} ...`;
+                    statusText.innerText = `[ไฟล์ ${i+1}/${files.length}] แกะข้อความ: ${file.name} ...`;
                     const rawText = await extractTextFromPDF(file);
                     
                     if (!rawText || rawText.trim() === "") {
                         throw new Error("ไฟล์ PDF เป็นรูปภาพสแกน ไม่มีตัวหนังสือให้แกะครับ");
                     }
 
-                    statusText.innerText = `[2/2] วิเคราะห์ข้อมูลด้วย ${modelSelect.options[modelSelect.selectedIndex].text}...`;
-                    const structuredData = await processWithAI(rawText, currentApiKey, selectedModel);
+                    statusText.innerText = `[ไฟล์ ${i+1}/${files.length}] AI กำลังวิเคราะห์ข้อมูล...`;
+                    const structuredData = await processWithAI(rawText);
                     
                     if(structuredData) {
                         extractedDataList.push(structuredData);
                         addRowToTable(structuredData);
                     }
                 } catch (error) {
-                    showDebugError(`ไฟล์ ${file.name}: ${error.message}`);
+                    showDebugError(`เกิดปัญหาที่ไฟล์ ${file.name}:\n${error.message}`);
                 }
             }
 
@@ -348,7 +193,7 @@
                         }
                         resolve(fullText);
                     } catch (error) {
-                        reject(new Error("อ่าน PDF ไม่ได้ (ไฟล์อาจเสียหรือติดรหัส)"));
+                        reject(new Error("อ่าน PDF ไม่ได้ (ไฟล์อาจเสียหรือติดรหัสผ่าน)"));
                     }
                 };
                 reader.onerror = () => reject(new Error("เบราว์เซอร์อ่านไฟล์ล้มเหลว"));
@@ -356,7 +201,7 @@
             });
         }
 
-        async function processWithAI(text, apiKeyToUse, modelPath) {
+        async function processWithAI(text) {
             const shortText = text.substring(0, 10000);
             const systemPrompt = `
                 คุณคือผู้เชี่ยวชาญด้าน HR หน้าที่ของคุณคือสกัดข้อมูลจากเรซูเม่ (Resume/CV) 
@@ -373,7 +218,8 @@
                 ห้ามอธิบายเพิ่ม ให้ตอบกลับมาเป็น JSON format ตามโครงสร้างด้านล่างนี้เท่านั้น
             `;
 
-            const apiUrl = `https://generativelanguage.googleapis.com/${modelPath}:generateContent?key=${apiKeyToUse}`;
+            // ดึงค่า API Key และ Model จากที่เราตั้งค่าไว้ด้านบน
+            const apiUrl = `https://generativelanguage.googleapis.com/${TARGET_MODEL}:generateContent?key=${MY_API_KEY}`;
 
             const response = await fetch(apiUrl, {
                 method: 'POST',
@@ -402,7 +248,8 @@
             try { result = JSON.parse(responseText); } catch(e) { throw new Error("JSON Parse Error: " + responseText); }
 
             if (!response.ok || result.error) {
-                throw new Error(JSON.stringify(result.error || responseText));
+                let errMsg = result.error ? result.error.message : responseText;
+                throw new Error("AI ปฏิเสธการทำงาน: " + errMsg);
             }
 
             let jsonString = result.candidates[0].content.parts[0].text;
@@ -414,13 +261,13 @@
             const tr = document.createElement('tr');
             tr.className = "hover:bg-indigo-50 transition-colors";
             tr.innerHTML = `
-                <td class="p-3 border-b text-gray-800">${data.firstName || '-'}</td>
-                <td class="p-3 border-b text-gray-800">${data.lastName || '-'}</td>
-                <td class="p-3 border-b text-indigo-600 font-medium">${data.email || '-'}</td>
-                <td class="p-3 border-b text-gray-800">${data.phone || '-'}</td>
-                <td class="p-3 border-b font-semibold text-gray-700">${data.recentJobTitle || '-'}</td>
-                <td class="p-3 border-b text-gray-800">${data.recentCompany || '-'}</td>
-                <td class="p-3 border-b text-purple-600">${data.skills || '-'}</td>
+                <td class="p-4 border-b text-gray-800">${data.firstName || '-'}</td>
+                <td class="p-4 border-b text-gray-800">${data.lastName || '-'}</td>
+                <td class="p-4 border-b text-indigo-600 font-medium">${data.email || '-'}</td>
+                <td class="p-4 border-b text-gray-800">${data.phone || '-'}</td>
+                <td class="p-4 border-b font-semibold text-gray-700">${data.recentJobTitle || '-'}</td>
+                <td class="p-4 border-b text-gray-800">${data.recentCompany || '-'}</td>
+                <td class="p-4 border-b text-purple-600">${data.skills || '-'}</td>
             `;
             resultBody.appendChild(tr);
         }
