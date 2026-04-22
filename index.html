@@ -136,7 +136,7 @@
             return userKey;
         }
 
-        // ฟังก์ชันใหม่: ทดสอบกุญแจว่าใช้ได้จริงไหม
+        // ฟังก์ชันทดสอบกุญแจ
         async function testApiKey() {
             const key = getApiKey();
             if(!key) {
@@ -148,7 +148,8 @@
             statusText.innerText = "กำลังทดสอบเชื่อมต่อกับระบบ AI...";
 
             try {
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+                // อัปเดต: เปลี่ยนชื่อรุ่น AI กลับเป็นรุ่นล่าสุดที่รองรับ
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`;
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -230,7 +231,6 @@
                     }
                 } catch (error) {
                     console.error("Error Detail:", error);
-                    // สังเกตว่า Error ของใหม่จะมีเครื่องหมาย ❌ แบบนี้นะครับ
                     alert(`❌ ดึงข้อมูลจากไฟล์ ${file.name} ไม่สำเร็จ\n\nสาเหตุ: ${error.message}`);
                 }
             }
@@ -281,7 +281,8 @@
                 ห้ามอธิบายเพิ่ม ให้ตอบกลับมาเป็น JSON format ตามโครงสร้างด้านล่างนี้เท่านั้น
             `;
 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKeyToUse}`;
+            // อัปเดต: เปลี่ยนชื่อรุ่น AI กลับเป็นรุ่นล่าสุด
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKeyToUse}`;
 
             try {
                 const response = await fetch(apiUrl, {
