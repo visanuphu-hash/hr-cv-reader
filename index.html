@@ -5,31 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HR Smart CV Reader ✨</title>
     
-    <!-- นำเข้า Tailwind CSS (ใช้สำหรับตกแต่งหน้าเว็บให้สวยงาม) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- นำเข้า PDF.js (เครื่องมือสำหรับอ่านตัวหนังสือจากไฟล์ PDF) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    
-    <!-- เพิ่มใหม่: นำเข้า ExcelJS (เครื่องมือสร้างและตกแต่งไฟล์ Excel) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
-
-    <!-- นำเข้า Font Awesome (สำหรับใส่ไอคอนสวยๆ) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- นำเข้า Google Font (Kanit) เพื่อให้ตัวหนังสือภาษาไทยอ่านง่าย -->
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <style>
-        /* ตั้งค่าฟอนต์หลักของเว็บ */
         body {
             font-family: 'Kanit', sans-serif;
-            /* สร้างพื้นหลังแบบไล่สี (Gradient) */
             background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
             min-height: 100vh;
         }
-
-        /* สไตล์กล่องกระจก (Glassmorphism) */
         .glass-panel {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
@@ -37,19 +24,17 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
         }
-
-        /* เอฟเฟกต์ตอนลากไฟล์มาวางทับ */
         .dragover {
             background: rgba(255, 255, 255, 0.95) !important;
             border-color: #fda085 !important;
             transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(253, 160, 133, 0.5);
         }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <div class="max-w-6xl mx-auto glass-panel p-6 md:p-10">
-        <!-- ส่วนหัวของโปรแกรม -->
         <div class="text-center mb-8">
             <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
                 <i class="fa-solid fa-magic-wand-sparkles text-orange-500"></i> HR Smart CV Reader
@@ -57,18 +42,312 @@
             <p class="text-gray-600">ผู้ช่วย AI ดึงข้อมูลจาก Resume อัตโนมัติ แล้วส่งออกเป็น Excel</p>
         </div>
 
-        <!-- กล่องสำหรับอัปโหลดไฟล์ (Drag & Drop) -->
-        <div id="drop-zone" class="border-4 border-dashed border-gray-300 rounded-xl p-10 text-center bg-white bg-opacity-50 transition-all duration-300 cursor-pointer hover:bg-opacity-80">
+        <!-- 🔑 เพิ่มใหม่: ช่องใส่ API Key สำหรับใช้งานส่วนตัว -->
+        <div class="mb-8 bg-orange-50 p-4 rounded-xl border border-orange-200">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                <i class="fa-solid fa-key text-orange-400"></i> กรอก Gemini API Key ของคุณ (ฟรี) เพื่อให้ AI ทำงานได้
+            </label>
+            <div class="flex gap-2">
+                <input type="password" id="api-key-input" placeholder="วาง API Key ตรงนี้ (ขึ้นต้นด้วย AIza...)" 
+                       class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400 outline-none">
+                <button onclick="saveApiKey()" class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                    บันทึกกุญแจ
+                </button>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">
+                * ข้อมูลนี้จะถูกเก็บไว้แค่ในคอมพิวเตอร์ของคุณเท่านั้น ปลอดภัย 100% 
+                (ขอ API Key ฟรีได้ที่ <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-500 underline">Google AI Studio</a>)
+            </p>
+        </div>
+
+        <!-- กล่องลากไฟล์ -->
+        <div id="drop-zone" class="border-4 border-dashed border-gray-300 rounded-xl p-10 text-center bg-white bg-opacity-50 transition-all duration-300 cursor-pointer hover:bg-opacity-80 relative overflow-hidden">
             <i class="fa-regular fa-file-pdf text-6xl text-gray-400 mb-4"></i>
-            <h3 class="text-xl font-semibold text-gray-700">คลิกเพื่อเลือกไฟล์ หรือ ลากไฟล์ PDF มาวางตรงนี้</h3>
-            <p class="text-gray-500 mt-2">รองรับการอัปโหลดครั้งละหลายไฟล์</p>
+            <h3 class="text-xl font-semibold text-gray-700">คลิกที่นี่ หรือ ลากไฟล์ PDF มาวางตรงนี้</h3>
+            <p class="text-gray-500 mt-2">รองรับการอัปโหลดครั้งละหลายไฟล์ (ลากทิ้งไว้ตรงนี้ได้เลย)</p>
             <input type="file" id="file-input" class="hidden" accept=".pdf" multiple>
         </div>
 
-        <!-- สถานะการทำงาน (โหลดดิ้ง) -->
-        <div id="status-message" class="text-center mt-6 text-orange-600 font-medium hidden">
-            <i class="fa-solid fa-spinner fa-spin mr-2"></i> กำลังให้ AI อ่านข้อมูล... กรุณารอสักครู่ (อาจใช้เวลา 5-10 วินาทีต่อไฟล์)
+        <!-- สถานะการทำงาน -->
+        <div id="status-message" class="text-center mt-6 text-orange-600 font-medium hidden p-4 bg-orange-50 rounded-lg">
+            <i class="fa-solid fa-spinner fa-spin mr-2"></i> <span id="status-text">กำลังให้ AI อ่านข้อมูล... กรุณารอสักครู่</span>
         </div>
 
-        <!-- ตารางแสดงผลข้อมูลที่ดึงมาได้ -->
-        <div class="mt-10 overflow-x
+        <!-- ตารางแสดงผล -->
+        <div class="mt-10 overflow-x-auto hidden" id="result-container">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-800">ข้อมูลที่ดึงได้</h2>
+                <button onclick="exportToExcel()" class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg shadow transition-colors">
+                    <i class="fa-solid fa-file-excel mr-2"></i> ดาวน์โหลด Excel แบบจัดหน้า
+                </button>
+            </div>
+            
+            <table class="w-full text-left border-collapse bg-white rounded-lg overflow-hidden shadow-sm text-sm md:text-base">
+                <thead class="bg-gray-800 text-white">
+                    <tr>
+                        <th class="p-3">ชื่อ</th>
+                        <th class="p-3">นามสกุล</th>
+                        <th class="p-3">อีเมล</th>
+                        <th class="p-3">เบอร์ติดต่อ</th>
+                        <th class="p-3">ตำแหน่งล่าสุด</th>
+                        <th class="p-3">บริษัทล่าสุด</th>
+                        <th class="p-3">ทักษะเด่น</th>
+                    </tr>
+                </thead>
+                <tbody id="result-body" class="divide-y divide-gray-200">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const statusMessage = document.getElementById('status-message');
+        const statusText = document.getElementById('status-text');
+        const resultContainer = document.getElementById('result-container');
+        const resultBody = document.getElementById('result-body');
+        const apiKeyInput = document.getElementById('api-key-input');
+
+        let extractedDataList = [];
+
+        // --- ระบบบันทึก API Key ---
+        window.onload = () => {
+            const savedKey = localStorage.getItem('myGeminiKey');
+            if(savedKey) apiKeyInput.value = savedKey;
+        };
+
+        function saveApiKey() {
+            const key = apiKeyInput.value.trim();
+            if(key) {
+                localStorage.setItem('myGeminiKey', key);
+                alert("บันทึกกุญแจสำเร็จ! ลองอัปโหลดไฟล์ได้เลยครับ");
+            } else {
+                alert("กรุณากรอกกุญแจก่อนบันทึกครับ");
+            }
+        }
+
+        function getApiKey() {
+            // ในโหมด Preview ของระบบ จะใช้ Key จำลองได้ แต่ถ้าใช้จริงต้องเอากุญแจที่ผู้ใช้กรอก
+            const userKey = apiKeyInput.value.trim();
+            // ระบบอัตโนมัติสำหรับหน้าต่าง Preview ของเรา
+            if (typeof apiKey !== 'undefined' && apiKey !== "") return apiKey; 
+            return userKey;
+        }
+
+        // --- แก้ปัญหาลากไฟล์ (ป้องกันเบราว์เซอร์เปิดไฟล์ทับหน้าเว็บ) ---
+        window.addEventListener('dragover', (e) => e.preventDefault());
+        window.addEventListener('drop', (e) => e.preventDefault());
+
+        // --- ส่วนจัดการการลากและวางไฟล์ในกล่อง ---
+        dropZone.addEventListener('click', () => fileInput.click());
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        async function handleFiles(files) {
+            if (files.length === 0) return;
+            
+            const currentApiKey = getApiKey();
+            if(!currentApiKey) {
+                alert("⚠️ กรุณากรอก Gemini API Key ด้านบนก่อนนะครับ ไม่งั้น AI จะไม่ยอมทำงานครับ");
+                apiKeyInput.focus();
+                return;
+            }
+            
+            statusMessage.classList.remove('hidden');
+            resultContainer.classList.remove('hidden');
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (file.type !== 'application/pdf') {
+                    alert(`ไฟล์ ${file.name} ไม่ใช่ PDF ครับ ขอข้ามไปก่อนนะ`);
+                    continue;
+                }
+
+                try {
+                    statusText.innerText = `กำลังแกะตัวหนังสือจากไฟล์: ${file.name} ...`;
+                    const rawText = await extractTextFromPDF(file);
+                    
+                    statusText.innerText = `ให้ AI อ่านไฟล์: ${file.name} (อาจใช้เวลา 5-10 วินาที) ...`;
+                    const structuredData = await processWithAI(rawText, currentApiKey);
+                    
+                    if(structuredData) {
+                        extractedDataList.push(structuredData);
+                        addRowToTable(structuredData);
+                    }
+                } catch (error) {
+                    console.error("เกิดข้อผิดพลาดกับไฟล์ " + file.name, error);
+                    alert(`อ๊ะ! ดึงข้อมูลจากไฟล์ ${file.name} ไม่สำเร็จครับ (ถ้า API Key ผิดจะขึ้นข้อผิดพลาดนี้ได้ครับ)`);
+                }
+            }
+
+            statusMessage.classList.add('hidden');
+            // รีเซ็ตช่องเลือกไฟล์ เผื่อเลือกลากไฟล์เดิมซ้ำ
+            fileInput.value = ''; 
+        }
+
+        async function extractTextFromPDF(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = async function() {
+                    try {
+                        const typedarray = new Uint8Array(this.result);
+                        const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                        let fullText = "";
+                        
+                        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                            const page = await pdf.getPage(pageNum);
+                            const textContent = await page.getTextContent();
+                            const pageText = textContent.items.map(item => item.str).join(" ");
+                            fullText += pageText + " \n";
+                        }
+                        resolve(fullText);
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        async function processWithAI(text, apiKeyToUse) {
+            const shortText = text.substring(0, 10000);
+            const systemPrompt = `
+                คุณคือผู้เชี่ยวชาญด้าน HR หน้าที่ของคุณคือสกัดข้อมูลจากเรซูเม่ (Resume/CV) 
+                ให้อ่านข้อความที่ให้มา และดึงข้อมูลต่อไปนี้ออกมา:
+                1. ชื่อจริง (ไม่ต้องเอาคำนำหน้า)
+                2. นามสกุล
+                3. อีเมล (Email)
+                4. เบอร์โทรศัพท์
+                5. ตำแหน่งงานที่ทำล่าสุด (Recent Job Title)
+                6. ชื่อบริษัทที่ทำงานล่าสุด (Recent Company)
+                7. ทักษะเด่น (Skills) ให้ดึงมาสัก 3-5 อย่าง คั่นด้วยลูกน้ำ (,)
+
+                หากหาข้อมูลไหนไม่เจอ ให้ใส่ค่าว่าง "" 
+                ห้ามอธิบายเพิ่ม ให้ตอบกลับมาเป็น JSON format ตามโครงสร้างด้านล่างนี้เท่านั้น
+            `;
+
+            // ใช้ Model ตัวฟรีล่าสุดของ Gemini
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKeyToUse}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: shortText }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] },
+                        generationConfig: {
+                            responseMimeType: "application/json",
+                            responseSchema: {
+                                type: "OBJECT",
+                                properties: {
+                                    firstName: { type: "STRING" },
+                                    lastName: { type: "STRING" },
+                                    email: { type: "STRING" },
+                                    phone: { type: "STRING" },
+                                    recentJobTitle: { type: "STRING" },
+                                    recentCompany: { type: "STRING" },
+                                    skills: { type: "STRING" }
+                                },
+                                required: ["firstName", "lastName", "email", "phone", "recentJobTitle", "recentCompany", "skills"]
+                            }
+                        }
+                    })
+                });
+
+                if (!response.ok) throw new Error("API Error หรือ API Key ไม่ถูกต้อง");
+
+                const result = await response.json();
+                const jsonString = result.candidates[0].content.parts[0].text;
+                return JSON.parse(jsonString);
+
+            } catch (error) {
+                console.error("AI Error:", error);
+                throw error; // โยน error กลับไปให้ฟังก์ชันหลักแจ้งเตือน
+            }
+        }
+
+        function addRowToTable(data) {
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-gray-50 transition-colors";
+            
+            tr.innerHTML = `
+                <td class="p-3 border-b text-gray-700">${data.firstName || '-'}</td>
+                <td class="p-3 border-b text-gray-700">${data.lastName || '-'}</td>
+                <td class="p-3 border-b text-blue-600">${data.email || '-'}</td>
+                <td class="p-3 border-b text-gray-700">${data.phone || '-'}</td>
+                <td class="p-3 border-b text-gray-700 font-medium">${data.recentJobTitle || '-'}</td>
+                <td class="p-3 border-b text-gray-700">${data.recentCompany || '-'}</td>
+                <td class="p-3 border-b text-green-600">${data.skills || '-'}</td>
+            `;
+            resultBody.appendChild(tr);
+        }
+
+        async function exportToExcel() {
+            if (extractedDataList.length === 0) {
+                alert("ยังไม่มีข้อมูลให้ส่งออกครับ");
+                return;
+            }
+
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('รายชื่อผู้สมัคร');
+
+            worksheet.columns = [
+                { header: 'ชื่อ', key: 'firstName', width: 15 },
+                { header: 'นามสกุล', key: 'lastName', width: 20 },
+                { header: 'อีเมล', key: 'email', width: 30 },
+                { header: 'เบอร์ติดต่อ', key: 'phone', width: 15 },
+                { header: 'ตำแหน่งล่าสุด', key: 'recentJobTitle', width: 30 },
+                { header: 'บริษัทล่าสุด', key: 'recentCompany', width: 25 },
+                { header: 'ทักษะเด่น', key: 'skills', width: 45 }
+            ];
+
+            extractedDataList.forEach(data => {
+                worksheet.addRow(data);
+            });
+
+            const headerRow = worksheet.getRow(1);
+            headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1F2937' } };
+            headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+
+            worksheet.eachRow((row, rowNumber) => {
+                row.eachCell((cell) => {
+                    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                    if (rowNumber > 1) cell.alignment = { vertical: 'middle', wrapText: true }; 
+                });
+            });
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "HR_Smart_CV_Data.xlsx");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
