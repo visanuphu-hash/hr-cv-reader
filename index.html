@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- เปลี่ยนชื่อ Title เพื่อให้สังเกตง่ายว่าอัปเดตแล้ว -->
-    <title>HR Smart CV Reader v2 ✨</title>
+    <title>HR Smart CV Reader v3 ✨</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
@@ -38,7 +37,7 @@
     <div class="max-w-6xl mx-auto glass-panel p-6 md:p-10">
         <div class="text-center mb-8">
             <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
-                <i class="fa-solid fa-magic-wand-sparkles text-orange-500"></i> HR Smart CV Reader <span class="text-blue-500 text-2xl">v2</span>
+                <i class="fa-solid fa-magic-wand-sparkles text-orange-500"></i> HR Smart CV Reader <span class="text-purple-500 text-2xl">v3</span>
             </h1>
             <p class="text-gray-600">ผู้ช่วย AI ดึงข้อมูลจาก Resume อัตโนมัติ แล้วส่งออกเป็น Excel</p>
         </div>
@@ -147,8 +146,8 @@
             statusText.innerText = "กำลังทดสอบเชื่อมต่อกับระบบ AI...";
 
             try {
-                // อัปเกรดเป็น gemini-2.0-flash รุ่นใหม่ล่าสุด
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`;
+                // อัปเดต: ใช้ gemini-1.5-flash-8b สำหรับสายฟรี 100% โควต้าเยอะ ไม่จำกัด
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent?key=${key}`;
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -280,8 +279,8 @@
                 ห้ามอธิบายเพิ่ม ให้ตอบกลับมาเป็น JSON format ตามโครงสร้างด้านล่างนี้เท่านั้น
             `;
 
-            // อัปเกรดเป็น gemini-2.0-flash
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKeyToUse}`;
+            // อัปเดต: ใช้ gemini-1.5-flash-8b รุ่นขวัญใจสายฟรี
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent?key=${apiKeyToUse}`;
 
             try {
                 const response = await fetch(apiUrl, {
