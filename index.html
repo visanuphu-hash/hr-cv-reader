@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR Smart CV Reader v4 ✨</title>
+    <title>HR Smart CV Reader v5 ✨</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
@@ -37,7 +37,7 @@
     <div class="max-w-6xl mx-auto glass-panel p-6 md:p-10">
         <div class="text-center mb-8">
             <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
-                <i class="fa-solid fa-magic-wand-sparkles text-orange-500"></i> HR Smart CV Reader <span class="text-pink-500 text-2xl">v4</span>
+                <i class="fa-solid fa-magic-wand-sparkles text-orange-500"></i> HR Smart CV Reader <span class="text-emerald-500 text-2xl">v5</span>
             </h1>
             <p class="text-gray-600">ผู้ช่วย AI ดึงข้อมูลจาก Resume อัตโนมัติ แล้วส่งออกเป็น Excel</p>
         </div>
@@ -60,21 +60,20 @@
                     </div>
                 </div>
                 
-                <!-- กล่องเลือกรุ่น AI เพิ่มใหม่ใน v4 -->
                 <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 pt-2 border-t border-orange-200">
-                    <label class="text-sm font-medium text-gray-700">เลือกรุ่น AI ที่จะใช้งาน:</label>
+                    <label class="text-sm font-medium text-gray-700">เลือกรุ่นเซิร์ฟเวอร์ AI:</label>
                     <select id="model-select" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400 outline-none bg-white text-gray-700 flex-1 sm:flex-none">
-                        <option value="gemini-2.5-flash-preview-09-2025">Gemini 2.5 Flash (ใหม่ล่าสุด/แนะนำ)</option>
-                        <option value="gemini-1.5-flash">Gemini 1.5 Flash (รุ่นมาตรฐาน)</option>
-                        <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
-                        <option value="gemini-pro">Gemini Pro (รุ่นเก่า)</option>
+                        <!-- เปลี่ยนโครงสร้าง Value ให้มีชื่อเวอร์ชันของ API ด้วย เพื่อแก้ปัญหา Not Found -->
+                        <option value="v1/models/gemini-1.5-flash">Gemini 1.5 Flash (รุ่น v1 เสถียรที่สุด แนะนำ!)</option>
+                        <option value="v1beta/models/gemini-1.5-flash">Gemini 1.5 Flash (รุ่น v1beta ทดลอง)</option>
+                        <option value="v1beta/models/gemini-2.5-flash-preview-09-2025">Gemini 2.5 Flash Preview</option>
+                        <option value="v1beta/models/gemini-2.0-flash">Gemini 2.0 Flash</option>
                     </select>
-                    <span class="text-xs text-gray-500">* ถ้าทดสอบแล้ว Error ให้ลองเปลี่ยนรุ่นแล้วกดทดสอบใหม่ครับ</span>
                 </div>
             </div>
             
             <p class="text-xs text-gray-500 mt-3">
-                (ขอ API Key ฟรีได้ที่ <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-500 underline">Google AI Studio</a>)
+                * หากฟ้องว่า Limit 0 หรือ Quota Exceeded คุณต้องไปกดยืนยันตัวตน <span class="font-bold text-red-500">"Set up billing"</span> ที่ <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-600 underline">Google AI Studio</a> ก่อนครับ (ผูกบัตรแต่ใช้ฟรีไม่เสียเงิน)
             </p>
         </div>
 
@@ -129,7 +128,6 @@
 
         let extractedDataList = [];
 
-        // โหลดข้อมูลที่เคยบันทึกไว้
         window.onload = () => {
             const savedKey = localStorage.getItem('myGeminiKey');
             const savedModel = localStorage.getItem('myGeminiModel');
@@ -137,7 +135,6 @@
             if(savedModel) modelSelect.value = savedModel;
         };
 
-        // บันทึกทั้ง Key และ Model
         function saveSettings() {
             const key = apiKeyInput.value.trim();
             const model = modelSelect.value;
@@ -158,7 +155,7 @@
 
         async function testApiKey() {
             const key = getApiKey();
-            const model = modelSelect.value;
+            const modelPath = modelSelect.value; 
             
             if(!key) {
                 alert("⚠️ กรุณากรอก API Key ก่อนกดทดสอบครับ");
@@ -166,11 +163,11 @@
             }
 
             statusMessage.classList.remove('hidden');
-            statusText.innerText = `กำลังทดสอบเชื่อมต่อกับรุ่น ${model}...`;
+            statusText.innerText = `กำลังทดสอบเชื่อมต่อกับรุ่น...`;
 
             try {
-                // ดึงชื่อรุ่นจากที่ผู้ใช้เลือกใน Dropdown
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+                // อัปเดตโครงสร้าง API URL ให้ยืดหยุ่นรองรับทั้ง v1 และ v1beta
+                const apiUrl = `https://generativelanguage.googleapis.com/${modelPath}:generateContent?key=${key}`;
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -183,10 +180,20 @@
                     throw new Error(result.error.message);
                 }
 
-                alert(`✅ ยอดเยี่ยม! รุ่น ${model} ใช้งานได้ปกติ ลากไฟล์มาวางได้เลยครับ!`);
-                saveSettings(); // บันทึกรุ่นที่ใช้ได้ไว้อัตโนมัติ
+                alert(`✅ ยอดเยี่ยม! การเชื่อมต่อ AI สำเร็จใช้งานได้ปกติ ลากไฟล์มาวางได้เลยครับ!`);
+                saveSettings(); 
             } catch (error) {
-                alert(`❌ รุ่นนี้ใช้งานไม่ได้ครับ!\n\nสาเหตุ: ${error.message}\n\n👉 วิธีแก้: ลองกดเปลี่ยนรุ่น AI เป็นรุ่นอื่นในตัวเลือก แล้วกดทดสอบใหม่ดูครับ`);
+                let errorMessage = error.message;
+                let userFriendlyFix = "ลองกดเปลี่ยนรุ่น AI เป็นรุ่นอื่นในตัวเลือก แล้วกดทดสอบใหม่ดูครับ";
+
+                // ดักจับ Error แจ้งผู้ใช้แบบชัดเจน
+                if(errorMessage.includes("limit: 0") || errorMessage.includes("Quota exceeded")) {
+                    userFriendlyFix = "🚨 Google ต้องการให้คุณยืนยันตัวตนครับ!\nวิธีแก้: ไปที่เว็บ Google AI Studio -> กดปุ่ม 'Set up billing' (ผูกบัตร) เพื่อปลดล็อคโควต้าฟรีครับ (ไม่หักเงินครับ)";
+                } else if (errorMessage.includes("API_KEY_INVALID")) {
+                    userFriendlyFix = "กุญแจผิดพลาดครับ ลองไปกดสร้าง API Key ใหม่แบบ Create in New Project ดูครับ";
+                }
+
+                alert(`❌ ใช้งานไม่ได้ครับ!\n\nข้อความจากระบบ: ${errorMessage}\n\n👉 ${userFriendlyFix}`);
             }
 
             statusMessage.classList.add('hidden');
@@ -196,25 +203,14 @@
         window.addEventListener('drop', (e) => e.preventDefault());
 
         dropZone.addEventListener('click', () => fileInput.click());
-        
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('dragover');
-        });
-
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('dragover');
-        });
-
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.classList.remove('dragover');
             handleFiles(e.dataTransfer.files);
         });
-
-        fileInput.addEventListener('change', (e) => {
-            handleFiles(e.target.files);
-        });
+        fileInput.addEventListener('change', (e) => { handleFiles(e.target.files); });
 
         async function handleFiles(files) {
             if (files.length === 0) return;
@@ -253,7 +249,11 @@
                     }
                 } catch (error) {
                     console.error("Error Detail:", error);
-                    alert(`❌ ดึงข้อมูลจากไฟล์ ${file.name} ไม่สำเร็จ\n\nสาเหตุ: ${error.message}`);
+                    let alertMsg = `❌ ดึงข้อมูลจากไฟล์ ${file.name} ไม่สำเร็จ\n\nสาเหตุ: ${error.message}`;
+                    if(error.message.includes("limit: 0") || error.message.includes("Quota exceeded")) {
+                        alertMsg += "\n\n👉 ระบบต้องการให้กดยืนยันตัวตน 'Set up billing' ที่เว็บ AI Studio ก่อนครับ";
+                    }
+                    alert(alertMsg);
                 }
             }
 
@@ -286,7 +286,7 @@
             });
         }
 
-        async function processWithAI(text, apiKeyToUse, modelToUse) {
+        async function processWithAI(text, apiKeyToUse, modelPath) {
             const shortText = text.substring(0, 10000);
             const systemPrompt = `
                 คุณคือผู้เชี่ยวชาญด้าน HR หน้าที่ของคุณคือสกัดข้อมูลจากเรซูเม่ (Resume/CV) 
@@ -303,8 +303,8 @@
                 ห้ามอธิบายเพิ่ม ให้ตอบกลับมาเป็น JSON format ตามโครงสร้างด้านล่างนี้เท่านั้น
             `;
 
-            // ดึงข้อมูลผ่านรุ่นที่ผู้ใช้เลือก
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelToUse}:generateContent?key=${apiKeyToUse}`;
+            // ดึงข้อมูลผ่านรุ่นที่ผู้ใช้เลือก (รองรับทั้ง v1 และ v1beta)
+            const apiUrl = `https://generativelanguage.googleapis.com/${modelPath}:generateContent?key=${apiKeyToUse}`;
 
             try {
                 const response = await fetch(apiUrl, {
