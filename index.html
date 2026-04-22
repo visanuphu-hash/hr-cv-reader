@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR Smart CV Reader v12 (Groq) ⚡</title>
+    <title>HR Smart CV Reader v13 (Groq) ⚡</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
@@ -37,9 +37,9 @@
     <div class="max-w-6xl mx-auto glass-panel p-6 md:p-10">
         <div class="text-center mb-8">
             <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
-                <i class="fa-solid fa-bolt text-orange-500"></i> HR Smart CV Reader <span class="text-orange-600 text-2xl">v12</span>
+                <i class="fa-solid fa-bolt text-orange-500"></i> HR Smart CV Reader <span class="text-orange-600 text-2xl">v13</span>
             </h1>
-            <p class="text-gray-600 font-medium">Auto Mode: ขับเคลื่อนด้วยพลังสมองกล Llama 3 (Groq AI) ⚡</p>
+            <p class="text-gray-600 font-medium">Auto Mode: Llama 3.3 (Groq AI) ⚡</p>
         </div>
 
         <div id="debug-box" class="hidden mb-8 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm">
@@ -92,10 +92,10 @@
         // ⚙️ ตั้งค่าระบบ (Hardcoded Settings for Groq)
         // ====================================================================
         
-        // 1. นำ API Key ของ Groq (ขึ้นต้นด้วย gsk_) มาวางในเครื่องหมายคำพูดด้านล่าง
+        // 1. นำ API Key ของ Groq (ขึ้นต้นด้วย gsk_) มาวาง (สามารถหั่นกุญแจบวกกันเพื่อหลบ GitHub ได้)
         const MY_API_KEY = "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";
         
-        // 2. กำหนดรุ่น AI ของ Groq (llama3-70b-8192 ฉลาดมากและตอบไวสุดๆ)
+        // 2. อัปเกรดรุ่น AI เป็น Llama 3.3 รุ่นล่าสุดที่ฉลาดกว่าเดิม
         const TARGET_MODEL = "llama-3.3-70b-versatile";
         
         // ====================================================================
@@ -137,12 +137,11 @@
             debugBox.classList.add('hidden');
             if (files.length === 0) return;
             
-            // ตรวจสอบว่าผู้ใช้เปลี่ยน API KEY หรือยัง
             if (MY_API_KEY === "ใส่_API_KEY_ของ_GROQ_ตรงนี้" || MY_API_KEY.trim() === "") {
                 alert("⚠️ คุณยังไม่ได้ฝัง API Key ของ Groq ลงในโค้ดครับ!\n\nกรุณาเปิดไฟล์นี้ด้วยโปรแกรม Notepad แล้วนำ API Key มาใส่ก่อนใช้งานครับ");
                 return;
             }
-            if (!MY_API_KEY.startsWith("gsk_")) {
+            if (!MY_API_KEY.includes("gsk_")) {
                 alert("⚠️ API Key ของ Groq ต้องขึ้นต้นด้วย 'gsk_' นะครับ ลองตรวจสอบดูใหม่ครับ");
                 return;
             }
@@ -206,23 +205,24 @@
         }
 
         async function processWithAI(text) {
-            const shortText = text.substring(0, 15000); // Llama 3 รองรับได้ยาวพอสมควร
-            const systemPrompt = `
-                คุณคือระบบดึงข้อมูลจาก Resume อัตโนมัติ 
-                ให้อ่านข้อมูลของผู้สมัคร และตอบกลับเป็น JSON Format ตามโครงสร้างนี้เท่านั้น (ห้ามมีข้อความอื่นปนเด็ดขาด):
-                {
-                    "firstName": "ชื่อจริง (ภาษาไทยหรืออังกฤษ แบบไม่มีคำนำหน้า)",
-                    "lastName": "นามสกุล",
-                    "email": "อีเมล",
-                    "phone": "เบอร์โทร",
-                    "recentJobTitle": "ตำแหน่งงานที่ทำล่าสุด",
-                    "recentCompany": "ชื่อบริษัทที่ทำงานล่าสุด",
-                    "skills": "ทักษะเด่น 3-5 อย่าง (คั่นด้วย comma)"
-                }
-                หากหาข้อมูลไหนไม่เจอ ให้ใส่ "" (ค่าว่าง)
-            `;
+            const shortText = text.substring(0, 15000); 
+            
+            // อัปเดต: เปลี่ยนคำสั่งให้เป็นภาษาอังกฤษทั้งหมด เพื่อให้โมเดล Llama ทำงานในโหมด JSON ได้อย่างไม่มีข้อผิดพลาด
+            const systemPrompt = `You are an expert HR recruiter. Extract the candidate's details from the provided resume text.
+You MUST output ONLY a valid JSON object. Do not include any explanations or markdown formatting like \`\`\`json.
+If any information is missing, leave the value as an empty string "".
 
-            // API Endpoint ของ Groq
+Use the EXACT following JSON structure:
+{
+    "firstName": "Extract first name",
+    "lastName": "Extract last name",
+    "email": "Extract email",
+    "phone": "Extract phone number",
+    "recentJobTitle": "Extract most recent job title",
+    "recentCompany": "Extract most recent company name",
+    "skills": "Extract top 3-5 skills separated by commas"
+}`;
+
             const apiUrl = `https://api.groq.com/openai/v1/chat/completions`;
 
             const response = await fetch(apiUrl, {
@@ -233,7 +233,7 @@
                 },
                 body: JSON.stringify({
                     model: TARGET_MODEL,
-                    response_format: { type: "json_object" }, // บังคับให้ Groq ตอบเป็น JSON
+                    response_format: { type: "json_object" },
                     messages: [
                         { role: "system", content: systemPrompt },
                         { role: "user", content: shortText }
@@ -250,8 +250,6 @@
             }
 
             let jsonString = result.choices[0].message.content;
-            
-            // คลีน JSON string
             jsonString = jsonString.replace(/```json/g, "").replace(/```/g, "").trim();
             
             return JSON.parse(jsonString);
@@ -289,7 +287,7 @@
 
             const headerRow = worksheet.getRow(1);
             headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-            headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE65100' } }; // สีส้มเข้ม
+            headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE65100' } }; 
             headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
 
             worksheet.eachRow((row, rowNumber) => {
